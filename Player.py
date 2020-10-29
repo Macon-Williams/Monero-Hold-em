@@ -20,3 +20,12 @@ class Player(object):
 
     def get_money(self):
         return self.money
+
+    def bet_money(self, amount):
+        if amount > self.money:
+            print("Error, not enough money available")
+            return 0
+        else:
+            self.money -= amount
+            print("Subtracted " + str(amount) + " from player's pool")
+            return amount
