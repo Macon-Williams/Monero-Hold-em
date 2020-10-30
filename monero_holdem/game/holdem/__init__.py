@@ -38,10 +38,11 @@ class Holdem(Game):
         self.table.cards.append(self.deck.give_first_card())
         self.table_state = TableState.RIVER  # hmm
 
-    # Assign roles (dealer, little blind, big blind)
+    # Assign roles (dealer, little blind, big blind) to the first 3 users in the room
     def assign_roles(self):
         self.player_pool.assign_roles()
 
+    # Rotate the last user to the first user in the room
     def rotate_roles(self):
         self.player_pool.rotate_roles()
 
