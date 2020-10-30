@@ -9,6 +9,7 @@ class Holdem(Game):
     # Blind values in XMR
     SMALL_BLIND_VAL = 0.005
     BIG_BLIND_VAL = 0.01
+    round_start = False
 
     def __init__(self):
         self.player_pool = PlayerPool()
@@ -39,10 +40,10 @@ class Holdem(Game):
 
     # Assign roles (dealer, little blind, big blind)
     def assign_roles(self):
-        self.player_pool.get_player_count()
+        self.player_pool.assign_roles()
 
     def rotate_roles(self):
-        self.player_pool.rotate_dealer()
+        self.player_pool.rotate_roles()
 
     # Forces small blind and big blind to put in money before cards are drawn
     def blind_bet(self):
@@ -52,12 +53,11 @@ class Holdem(Game):
             if pl.role.role_type == HoldemRole.SMALL_BLIND:
                 self.table.add_pot(pl.bet_money(Holdem.SMALL_BLIND_VAL))
 
-        # TODO??
-
     def start_game(self):
         # do all the setup such as set dealers, etc
         self.assign_roles()
         self.blind_bet()
+        self.round_start = True
         # ... TODO
 
         done = False

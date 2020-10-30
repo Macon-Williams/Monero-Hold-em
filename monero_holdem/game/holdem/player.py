@@ -21,27 +21,28 @@ class PlayerPool(object):
     def get_player_count(self):
         return len(self.players)
 
-    def rotate_dealer(self):
-        # do the logic to move dealer, bb and sb
-        #
-        # role = ["deal", "bb", "sb"]
-        # # Initialize the array according to the number of players
-        # for i in range(len(player)):
-        #     for j in range(len(player)):
-        #         player[i].role.append("player")
-        #
-        # # Assign dealer, big blind, and small blind roles
-        # for i in range(len(player)):
-        #     for j in range(len(player)):
-        #         if j < 3:
-        #             player[i].role[j] = role[j]
-        #
-        # # Stagger the roles so that each round the blinds get shifted to a new player
-        # for i in range(len(player)):
-        #     player[i].role = (player[i].role[len(player[i].role) - i:len(player[i].role)] + player[i].role[
-        #                                                                                     0:len(player[i].role) - i])
+    def rotate_roles(self):
+        # TODO: Is this the correct way to implement this? I feel like I'm reinitializing the objects
+        for i in self.players.values():
+            # If the player is the small blind, make that player the dealer
+            if self.players.values(i).role == HoldemRole.SMALL_BLIND:
+                self.players.values(i).role = HoldemRole(True, role_type=HoldemRole.REGULAR)
+            # If the player is the big blind, make that player the small blind
+            if self.players.values(i).role == HoldemRole.BIG_BLIND:
+                self.players.values(i).role = HoldemRole(False, role_type=HoldemRole.SMALL_BLIND)
+            # I gotta think how we're gonna rotate the rest of them around.
 
-        raise NotImplementedError
+    # TODO: Is this the correct way to implement this? I feel like I'm reinitializing the objects
+    # Assumes that we have at least 3 players on a table, 2 of which can be bots
+    # Also, should dealer just be a standard role too instead of us keeping track with a boolean?
+    def assign_roles(self):
+        for i in self.players.values():
+            if i == 0:
+                self.players.value(i).role = HoldemRole(True, role_type=HoldemRole.REGULAR)
+            if i == 1:
+                self.players.value(i).role = HoldemRole(False, role_type=HoldemRole.SMALL_BLIND)
+            if i == 2:
+                self.players.value(i).role = HoldemRole(False, role_type=HoldemRole.BIG_BLIND)
 
 
 class Player(object):
@@ -84,4 +85,3 @@ class Player(object):
             self.balance -= amount
             log("Subtracted " + str(amount) + " from player's pool")
             return amount
-
