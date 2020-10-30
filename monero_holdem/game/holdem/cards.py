@@ -17,9 +17,6 @@ class Table(object):
     def add_pot(self, amount):
         self.pot += amount
 
-# TODO Verify that below this is ok lol
-# Modified to use table states instead of booleans
-
 
 class StateType(object):
     pass
@@ -52,3 +49,15 @@ class TableState(object):
             raise ValueError("Invalid instance type, must be of type StateType")
 
         self.table_state = table_state
+
+    def to_preflop(self):
+        self.table_state = TableState.PREFLOP
+
+    def to_flop(self):
+        self.table_state = TableState.FLOP
+
+    def to_turn(self):
+        self.table_state = TableState.TURN
+
+    def to_river(self):
+        self.table_state = TableState.RIVER

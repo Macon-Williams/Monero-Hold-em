@@ -9,12 +9,12 @@ class Holdem(Game):
     # Blind values in XMR
     SMALL_BLIND_VAL = 0.005
     BIG_BLIND_VAL = 0.01
-    round_start = False
+    round_active = False
 
     def __init__(self):
         self.player_pool = PlayerPool()
         self.table = Table()
-        self.table_state = TableState(table_state=TableState.PREFLOP)
+        self.table_state = TableState(TableState.PREFLOP)
         self.deck = DeckOfCards()
         super(Holdem, self).__init__()
 
@@ -22,21 +22,26 @@ class Holdem(Game):
         # TODO? do stuff as the player joins
         self.player_pool.add_player(Player(user))
 
+    def draw_player_cards(self):
+        for i in range(2):
+            for pl in self.player_pool:
+                pl.player_draw()
+
     def flop(self):
         self.deck.give_first_card()  # Burn a card
         for i in range(3):
             self.table.cards.append(self.deck.give_first_card())
-        self.table_state = TableState.FLOP  # hmm
+        self.table_state.to_flop()
 
     def turn(self):
         self.deck.give_first_card()  # Burn a card
         self.table.cards.append(self.deck.give_first_card())
-        self.table_state = TableState.TURN  # hmm
+        self.table_state.to_turn()
 
     def river(self):
         self.deck.give_first_card()  # Burn a card
         self.table.cards.append(self.deck.give_first_card())
-        self.table_state = TableState.RIVER  # hmm
+        self.table_state.to_river()
 
     # Assign roles (dealer, little blind, big blind) to the first 3 users in the room
     def assign_roles(self):
@@ -58,12 +63,18 @@ class Holdem(Game):
         # do all the setup such as set dealers, etc
         self.assign_roles()
         self.blind_bet()
-        self.round_start = True
+        self.round_active = True
+        self.draw_player_cards()
+        self.flop()
+        self.turn()
+        self.river()
+        self.round_active = False
         # ... TODO
 
         done = False
         while not done:
             for pl in self.player_pool:
                 pl.take_turn()
+                done = True
 
         raise NotImplementedError

@@ -7,14 +7,20 @@ class PlayerPool(object):
         self.players = []
 
     def __iter__(self):
-        for p in self.players.keys():
-            yield p
+        for p in self.players:
+            yield p.user.address
 
     def add_player(self, player):
-        self.players[player.user.address] = player
+        self.players.append(player)
 
-    def get_player(self, address):
-        return self.players[address]
+    def get_player_from_address(self, address):
+        for pl in self.players:
+            if pl.user.address == address:
+                return pl
+        raise ValueError("Player not found")
+
+    def get_player(self, location):
+        return self.players[location]
 
     def get_player_count(self):
         return len(self.players)
@@ -22,17 +28,10 @@ class PlayerPool(object):
     def rotate_roles(self):
         self.players = self.players[-1:] + self.players[:-1]
 
-    # TODO: Is this the correct way to implement this? I feel like I'm reinitializing the objects
-    # Assumes that we have at least 3 players on a table, 2 of which can be bots
-    # Also, should dealer just be a standard role too instead of us keeping track with a boolean?
     def assign_roles(self):
-        for i in range(3):
-            if i == 0:
-                self.players[i].role = HoldemRole(True, role_type=HoldemRole.REGULAR)
-            if i == 1:
-                self.players[i].role = HoldemRole(False, role_type=HoldemRole.SMALL_BLIND)
-            if i == 2:
-                self.players[i].role = HoldemRole(False, role_type=HoldemRole.BIG_BLIND)
+        self.players[0].role.to_dealer()
+        self.players[1].role.to_small_blind()
+        self.players[2].role.to_big_blind()
 
 
 class Player(object):
@@ -42,8 +41,7 @@ class Player(object):
         self.fold = False
         self.ready = False
         self.all_in = False
-        self.role = HoldemRole(False, role_type=HoldemRole.REGULAR)
-        self.win = False
+        self.role = HoldemRole(HoldemRole.REGULAR)
         self.balance = 0
 
     def take_turn(self):
@@ -51,9 +49,6 @@ class Player(object):
         print("What would you like to do?")
         # if ...
         raise NotImplementedError
-
-    def __repr__(self):
-        return self.user.name
 
     def player_draw(self, deck):
         self.cards.append(deck.give_first_card())
@@ -69,9 +64,9 @@ class Player(object):
 
     def bet_money(self, amount):
         if amount > self.balance:
-            log("Error, not enough money available")
+            log(f"Error, {self.user.name} tried to bed: {amount}. Not enough money available")
             return False
         else:
             self.balance -= amount
-            log("Subtracted " + str(amount) + " from player's pool")
+            log(f"Subtracted {amount} from player: {self.user.name}'s pool")
             return amount
