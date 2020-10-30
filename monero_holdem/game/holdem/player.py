@@ -18,6 +18,9 @@ class PlayerPool(object):
     def get_player(self, address):
         return self.players[address]
 
+    def get_player_count(self):
+        return len(self.players)
+
     def rotate_dealer(self):
         # do the logic to move dealer, bb and sb
         #
@@ -61,15 +64,11 @@ class Player(object):
     def __repr__(self):
         return self.user.name
 
-    def player_draw(self, deck, player):
-        for i in range(2):
-            for j in player:
-                player[j].cards.append(deck.give_first_card())
+    def player_draw(self, deck):
+        self.cards.append(deck.give_first_card())
 
-    def list_cards(self):
-        log(self.user.name + "\n===================")
-        for i in range(len(self.cards)):
-            print(self.cards[i].name)
+    def get_cards(self):
+        return self.cards
 
     def get_balance(self):
         return self.balance
