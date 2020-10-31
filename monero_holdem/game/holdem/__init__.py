@@ -31,7 +31,7 @@ class Holdem(Game):
     def flop(self):
         self.deck.give_first_card()  # Burn a card
         for i in range(3):
-            self.table.cards.append(self.deck.give_first_card())
+            self.table.add_card(self.deck.give_first_card())
         self.table_state.to_flop()
 
     def turn(self):

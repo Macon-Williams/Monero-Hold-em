@@ -41,6 +41,7 @@ class Player(object):
         self.fold = False
         self.ready = False
         self.all_in = False
+        self.lobby = True
         self.role = HoldemRole(HoldemRole.REGULAR)
 
     def take_turn(self):
@@ -54,6 +55,11 @@ class Player(object):
 
     def player_draw(self, deck):
         self.cards.append(deck.give_first_card())
+
+    # TODO make this better.
+    # Can we discard the cards without manually clearing the cards array?
+    def clear_cards(self):
+        self.cards = []
 
     def get_cards(self):
         return self.cards

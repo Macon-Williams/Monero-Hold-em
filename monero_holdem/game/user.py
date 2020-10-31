@@ -1,7 +1,7 @@
 class User(object):
     def __init__(self, name, address, xmr):
         self.name = name
-        self.address = address  # must be unique
+        self.address = address
         self.xmr = xmr
 
 

@@ -8,6 +8,7 @@ class Deck(object):
 class Table(object):
     def __init__(self):
         self.cards = []
+        self.discard = []
         self.pot = 0.0
 
     def list_cards(self):
@@ -15,11 +16,28 @@ class Table(object):
         for i in range(len(self.cards)):
             log(self.cards[i].name)
 
+    def add_card(self, card):
+        self.cards.append(card)
+
+    def discard_card(self, card):
+        self.discard.append(card)
+
+    def clear_cards(self):
+        for c in self.cards:
+            self.discard.append(c.pop)
+        return self.discard
+
     def return_pot(self):
         return self.pot
 
+    def clear_pot(self):
+        self.pot = 0.0
+
     def add_pot(self, amount):
         self.pot += amount
+        log(f"Added {amount} XMR to table pot.\nTotal XMR: {self.pot}")
+
+    # TODO implement reward_pot for player winnings
 
 
 class StateType(object):
