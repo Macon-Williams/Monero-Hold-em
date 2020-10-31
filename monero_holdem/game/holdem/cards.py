@@ -1,3 +1,6 @@
+from monero_holdem.log import log
+
+
 class Deck(object):
     pass
 
@@ -8,8 +11,9 @@ class Table(object):
         self.pot = 0.0
 
     def list_cards(self):
+        log("Cards currently on table:\n=-=-=-=-=-=-=-=-=-=-=-=-=")
         for i in range(len(self.cards)):
-            print(self.cards[i].name)
+            log(self.cards[i].name)
 
     def return_pot(self):
         return self.pot

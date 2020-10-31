@@ -1,6 +1,3 @@
-from monero_holdem.game.holdem import Holdem
-
-
 class Game(object):
     def __init__(self):
         pass

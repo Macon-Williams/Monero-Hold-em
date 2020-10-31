@@ -8,15 +8,15 @@ class PlayerPool(object):
 
     def __iter__(self):
         for p in self.players:
-            yield p.user.address
+            yield p
 
     def add_player(self, player):
         self.players.append(player)
 
     def get_player_from_address(self, address):
-        for pl in self.players:
-            if pl.user.address == address:
-                return pl
+        for p in self.players:
+            if p.user.address == address:
+                return p
         raise ValueError("Player not found")
 
     def get_player(self, location):
@@ -42,13 +42,15 @@ class Player(object):
         self.ready = False
         self.all_in = False
         self.role = HoldemRole(HoldemRole.REGULAR)
-        self.balance = 0
 
     def take_turn(self):
         # TODO make me async
         print("What would you like to do?")
         # if ...
         raise NotImplementedError
+
+    def get_name(self):
+        return self.user.name
 
     def player_draw(self, deck):
         self.cards.append(deck.give_first_card())
@@ -57,16 +59,16 @@ class Player(object):
         return self.cards
 
     def get_balance(self):
-        return self.balance
+        return self.user.xmr
 
     def add_balance(self, amount):
-        self.balance += amount
+        self.user.xmr += amount
 
     def bet_money(self, amount):
-        if amount > self.balance:
+        if amount > self.user.xmr:
             log(f"Error, {self.user.name} tried to bed: {amount}. Not enough money available")
             return False
         else:
-            self.balance -= amount
+            self.user.xmr -= amount
             log(f"Subtracted {amount} from player: {self.user.name}'s pool")
             return amount
