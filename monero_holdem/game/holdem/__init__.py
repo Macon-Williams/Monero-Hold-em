@@ -10,12 +10,10 @@ class Holdem(Game):
     # Blind values in XMR
     SMALL_BLIND_VAL = 0.005
     BIG_BLIND_VAL = 0.01
-    round_active = False
 
     def __init__(self):
         self.player_pool = PlayerPool()
         self.table = Table()
-        self.table_state = TableState(TableState.PREFLOP)
         self.deck = DeckOfCards()
         super(Holdem, self).__init__()
 
@@ -23,26 +21,29 @@ class Holdem(Game):
         # TODO? do stuff as the player joins
         self.player_pool.add_player(Player(user))
 
-    def draw_player_cards(self):
+    def deal_player_cards(self):
         for i in range(2):
             for pl in self.player_pool:
-                pl.player_draw(self.deck)
+                pl[-2].player_draw(self.deck)  # Small blind is dealt a card first
 
     def flop(self):
         self.deck.give_first_card()  # Burn a card
         for i in range(3):
             self.table.add_card(self.deck.give_first_card())
-        self.table_state.to_flop()
+        self.table.state.to_flop()
+        self.table.list_cards()
 
     def turn(self):
         self.deck.give_first_card()  # Burn a card
         self.table.cards.append(self.deck.give_first_card())
-        self.table_state.to_turn()
+        self.table.state.to_turn()
+        self.table.list_cards()
 
     def river(self):
         self.deck.give_first_card()  # Burn a card
         self.table.cards.append(self.deck.give_first_card())
-        self.table_state.to_river()
+        self.table.state.to_river()
+        self.table.list_cards()
 
     # Assign roles (dealer, little blind, big blind) to the first 3 users in the room
     def assign_roles(self):
@@ -60,24 +61,38 @@ class Holdem(Game):
             if p.role.role_type == HoldemRole.SMALL_BLIND:
                 self.table.add_pot(p.bet_money(Holdem.SMALL_BLIND_VAL))
 
+    def bet_round(self, starting_bet):
+        current_bet = starting_bet  # Keep track of the individual current bet
+        for p in self.player_pool:
+            log(f"{p.get_name()}"'s turn')
+            p.take_turn(current_bet)
+
     def start_game(self):
         # do all the setup such as set dealers, etc
-        self.assign_roles()
-        self.blind_bet()
-        self.round_active = True
-        self.draw_player_cards()
-        self.flop()
-        self.turn()
-        self.river()
-        self.table.list_cards()
-        self.round_active = False
-        # ... TODO
+        table_active = True
+        while table_active:
+            self.assign_roles()
+            self.blind_bet()
+            self.deal_player_cards()
 
-        done = False
-        while not done:
-            for pl in self.player_pool:
-                log(f"{pl.get_name()}"'s turn')
-                # pl.take_turn()
-                done = True
+            log(f"Pre-flop begins.")
+            # Start bet
+
+            log(f"Flop begins.")
+            self.flop()
+            # Start bet
+
+            log(f"Turn begins.")
+            self.turn()
+            # start bet
+
+            log(f"River begins.")
+            self.river()
+            # Start bet
+
+            # TODO Check cards
+            # TODO Payout winner
+
+            table_active = False
 
         # raise NotImplementedError

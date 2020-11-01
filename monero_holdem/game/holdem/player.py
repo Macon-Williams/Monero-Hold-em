@@ -29,26 +29,23 @@ class PlayerPool(object):
         self.players = self.players[-1:] + self.players[:-1]
 
     def assign_roles(self):
-        self.players[0].role.to_dealer()
-        self.players[1].role.to_small_blind()
-        self.players[2].role.to_big_blind()
+        for pl in self.players:
+            pl.role.to_regular()
+        self.players[-3].role.to_dealer()
+        self.players[-2].role.to_small_blind()
+        self.players[-1].role.to_big_blind()
 
 
 class Player(object):
     def __init__(self, user):
         self.user = user
         self.cards = []
+        self.amount_bet = 0.0
         self.fold = False
         self.ready = False
         self.all_in = False
-        self.lobby = True
+        self.win = False
         self.role = HoldemRole(HoldemRole.REGULAR)
-
-    def take_turn(self):
-        # TODO make me async
-        print("What would you like to do?")
-        # if ...
-        raise NotImplementedError
 
     def get_name(self):
         return self.user.name
@@ -56,10 +53,9 @@ class Player(object):
     def player_draw(self, deck):
         self.cards.append(deck.give_first_card())
 
-    # TODO make this better.
-    # Can we discard the cards without manually clearing the cards array?
-    def clear_cards(self):
-        self.cards = []
+    def clear_cards(self, deck):
+        for c in self.cards:
+            deck.take_card(c.pop)
 
     def get_cards(self):
         return self.cards
@@ -72,9 +68,35 @@ class Player(object):
 
     def bet_money(self, amount):
         if amount > self.user.xmr:
-            log(f"Error, {self.user.name} tried to bed: {amount}. Not enough money available")
+            log(f"Error, {self.get_name()} tried to bet: {amount}. Not enough money available")
             return False
         else:
             self.user.xmr -= amount
-            log(f"Subtracted {amount} from player: {self.user.name}'s pool")
+            log(f"Subtracted {amount} from player: {self.get_name()}'s pool")
+            self.amount_bet += amount
             return amount
+
+    def get_round_bet(self):
+        return self.amount_bet
+
+    def call(self, current_bet):
+        log(f"{self.get_name()} called.")
+        self.bet_money(current_bet)
+
+    def check(self):
+        log(f"{self.get_name()} checked.")
+
+    def fold(self):
+        log(f"{self.get_name()} folded.")
+
+    def raise_bet(self, amount):
+        log(f"{self.get_name()} raised by {amount}")
+        self.bet_money(amount)
+
+    def take_turn(self, current_bet):
+        # TODO make this sucker async babyyyyyy
+        # if current_bet > self.get_round_bet():
+            # Player can call or raise (if they have enough)... or they may fold
+        # else:
+            # Player can check, raise, or fold
+        raise NotImplementedError

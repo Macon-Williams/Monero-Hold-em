@@ -10,6 +10,7 @@ class Table(object):
         self.cards = []
         self.discard = []
         self.pot = 0.0
+        self.state = TableState(TableState.PREFLOP)
 
     def list_cards(self):
         log("Cards currently on table:\n=-=-=-=-=-=-=-=-=-=-=-=-=")
@@ -22,10 +23,11 @@ class Table(object):
     def discard_card(self, card):
         self.discard.append(card)
 
-    def clear_cards(self):
+    def clear_cards(self, deck):
         for c in self.cards:
             self.discard.append(c.pop)
-        return self.discard
+        for c in self.discard:
+            deck.take_card(c.pop)
 
     def return_pot(self):
         return self.pot
@@ -37,7 +39,10 @@ class Table(object):
         self.pot += amount
         log(f"Added {amount} XMR to table pot.\nTotal XMR: {self.pot}")
 
-    # TODO implement reward_pot for player winnings
+    def reward_pot(self):
+        award = self.pot
+        self.pot = 0.0
+        return award
 
 
 class StateType(object):
@@ -83,3 +88,4 @@ class TableState(object):
 
     def to_river(self):
         self.table_state = TableState.RIVER
+

@@ -30,6 +30,9 @@ class HoldemRole(object):
 
         self.role_type = role_type
 
+    def to_regular(self):
+        self.role_type = HoldemRole.REGULAR
+
     def to_dealer(self):
         self.role_type = HoldemRole.DEALER
 
