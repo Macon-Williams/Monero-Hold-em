@@ -95,8 +95,10 @@ class Player(object):
 
     def take_turn(self, current_bet):
         # TODO make this sucker async babyyyyyy
-        # if current_bet > self.get_round_bet():
-            # Player can call or raise (if they have enough)... or they may fold
-        # else:
+        if current_bet > self.get_round_bet():
+            pass
+            # Player can call or raise if they have enough, otherwise they may go all in with their Monero or they fold
+        else:
+            pass
             # Player can check, raise, or fold
         raise NotImplementedError

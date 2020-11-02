@@ -21,27 +21,28 @@ class Holdem(Game):
         # TODO? do stuff as the player joins
         self.player_pool.add_player(Player(user))
 
+    # TODO, ask about this
     def deal_player_cards(self):
         for i in range(2):
-            for pl in self.player_pool:
-                pl[-2].player_draw(self.deck)  # Small blind is dealt a card first
+            for j in range(self.player_pool.get_player_count()):
+                self.player_pool.get_player(j-2).player_draw(self.deck)  # Small blind is dealt a card first
 
     def flop(self):
-        self.deck.give_first_card()  # Burn a card
+        self.table.discard_card(self.deck.give_first_card())  # Burn a card
         for i in range(3):
             self.table.add_card(self.deck.give_first_card())
         self.table.state.to_flop()
         self.table.list_cards()
 
     def turn(self):
-        self.deck.give_first_card()  # Burn a card
-        self.table.cards.append(self.deck.give_first_card())
+        self.table.discard_card(self.deck.give_first_card())  # Burn a card
+        self.table.add_card(self.deck.give_first_card())
         self.table.state.to_turn()
         self.table.list_cards()
 
     def river(self):
-        self.deck.give_first_card()  # Burn a card
-        self.table.cards.append(self.deck.give_first_card())
+        self.table.discard_card(self.deck.give_first_card())  # Burn a card
+        self.table.add_card(self.deck.give_first_card())
         self.table.state.to_river()
         self.table.list_cards()
 
