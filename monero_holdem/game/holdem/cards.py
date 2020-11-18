@@ -1,10 +1,6 @@
 from monero_holdem.log import log
 
 
-class Deck(object):
-    pass
-
-
 class Table(object):
     def __init__(self):
         self.cards = []
@@ -29,7 +25,7 @@ class Table(object):
         for c in self.discard:
             deck.take_card(c.pop)
 
-    def return_pot(self):
+    def get_pot(self):
         return self.pot
 
     def clear_pot(self):
@@ -39,10 +35,12 @@ class Table(object):
         self.pot += amount
         log(f"Added {amount} XMR to table pot.\nTotal XMR: {self.pot}")
 
-    def reward_pot(self):
-        award = self.pot
-        self.pot = 0.0
-        return award
+    def reward_pot(self, amount):
+        self.pot -= amount
+        if self.pot < 0:
+            raise ValueError(f"Reward is greater than the xmr available in the pot."
+                             f"\nPot value: {self.pot} should be greater than 0")
+        return amount
 
 
 class StateType(object):

@@ -35,12 +35,19 @@ class PlayerPool(object):
         self.players[-2].role.to_small_blind()
         self.players[-1].role.to_big_blind()
 
+    def get_bet(self):
+        current_bet = 0
+        for pl in self.players:
+            if pl.get_round_bet() > current_bet:
+                current_bet = pl.get_round_bet()
+        return current_bet
+
 
 class Player(object):
     def __init__(self, user):
         self.user = user
         self.cards = []
-        self.amount_bet = 0.0
+        self.round_bet = 0.0
         self.fold = False
         self.ready = False
         self.all_in = False
@@ -73,11 +80,11 @@ class Player(object):
         else:
             self.user.xmr -= amount
             log(f"Subtracted {amount} from player: {self.get_name()}'s pool")
-            self.amount_bet += amount
+            self.round_bet += amount
             return amount
 
     def get_round_bet(self):
-        return self.amount_bet
+        return self.round_bet
 
     def call(self, current_bet):
         log(f"{self.get_name()} called.")
@@ -93,8 +100,9 @@ class Player(object):
         log(f"{self.get_name()} raised by {amount}")
         self.bet_money(amount)
 
-    def take_turn(self, current_bet):
+    async def take_turn(self, current_bet):
         # TODO make this sucker async babyyyyyy
+
         if current_bet > self.get_round_bet():
             pass
             # Player can call or raise if they have enough, otherwise they may go all in with their Monero or they fold

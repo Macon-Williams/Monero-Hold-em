@@ -21,7 +21,6 @@ class Holdem(Game):
         # TODO? do stuff as the player joins
         self.player_pool.add_player(Player(user))
 
-    # TODO, ask about this
     def deal_player_cards(self):
         for i in range(2):
             for j in range(self.player_pool.get_player_count()):
@@ -54,7 +53,7 @@ class Holdem(Game):
     def rotate_roles(self):
         self.player_pool.rotate_roles()
 
-    # Forces small blind and big blind to put in money before cards are drawn
+    # Forces small blind and big blind to add to the pot
     def blind_bet(self):
         for p in self.player_pool:
             if p.role.role_type == HoldemRole.BIG_BLIND:
@@ -62,22 +61,30 @@ class Holdem(Game):
             if p.role.role_type == HoldemRole.SMALL_BLIND:
                 self.table.add_pot(p.bet_money(Holdem.SMALL_BLIND_VAL))
 
-    def bet_round(self, starting_bet):
-        current_bet = starting_bet  # Keep track of the individual current bet
+    # TODO
+    def bet_round(self):
         for p in self.player_pool:
             log(f"{p.get_name()}"'s turn')
-            p.take_turn(current_bet)
+            await p.take_turn()
 
     def start_game(self):
-        # do all the setup such as set dealers, etc
+        """Handles the game setup and framework
+
+        Each player connected is assigned a role (dealer, big blind, small blind, or regular). The players with the role
+        of big blind and small blind are forced to pay the BIG_BLIND_VAL and the SMALL_BLIND_VAL respectively before
+        cards are dealt. Afterwards, cards will be passed out to players clockwise, starting with the small blind role.
+        Players are allowed to place pre-flop bets before any cards are drawn on the table. After each table draw (the
+        flop, the turn, and the river), players are granted an additional betting round.
+        """
         table_active = True
         while table_active:
+            current_bet = 0.0
             self.assign_roles()
             self.blind_bet()
             self.deal_player_cards()
 
             log(f"Pre-flop begins.")
-            # Start bet
+            self.bet_round()
 
             log(f"Flop begins.")
             self.flop()
@@ -94,6 +101,7 @@ class Holdem(Game):
             # TODO Check cards
             # TODO Payout winner
 
+            # TODO Check if players wish to play again
             table_active = False
 
-        # raise NotImplementedError
+        raise NotImplementedError
