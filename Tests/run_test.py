@@ -2,7 +2,7 @@ from monero_holdem.game.holdem import Holdem
 from monero_holdem.game.user import User, Bot
 
 # g = Game()  # holdem OR blackjack
-g = Holdem()  #
+g = Holdem()
 
 
 user = User("beanhead", "asdffsdfsedgfsdggs", 0)
